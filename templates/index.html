@@ -40,7 +40,7 @@
             letter-spacing: 1px;
         }
 
-        /* Refined Hero Section for Art */
+        /* Refined Hero Section */
         .hero-section { 
             padding: 100px 15px 60px 15px;
             text-align: center; 
@@ -72,7 +72,7 @@
         }
         
         .img-container { 
-            aspect-ratio: 4 / 5; /* Professional portrait aspect ratio */
+            aspect-ratio: 4 / 5; 
             overflow: hidden; 
             background: #f8f8f8; 
             position: relative;
@@ -109,28 +109,6 @@
             margin-bottom: 0;
         }
 
-        /* Filter Tabs */
-        .filter-nav {
-            margin-bottom: 40px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        .filter-btn {
-            background: none;
-            border: none;
-            font-weight: 700;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #ccc;
-            padding-bottom: 5px;
-        }
-        .filter-btn.active {
-            color: #000;
-            border-bottom: 2px solid #000;
-        }
-
         footer {
             background: #fcfcfc;
             border-top: 1px solid #eee;
@@ -148,7 +126,7 @@
 
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
-        <a class="navbar-brand" href="#">STUDIO.NAME</a>
+        <a class="navbar-brand" href="/">STUDIO.NAME</a>
         
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#portfolioNav">
             <span class="fa fa-bars"></span>
@@ -156,9 +134,13 @@
 
         <div class="collapse navbar-collapse" id="portfolioNav">
             <div class="navbar-nav ms-auto">
-                <a class="nav-link mx-2" href="#">Work</a>
-                <a class="nav-link mx-2" href="#">About</a>
-                <a class="nav-link mx-2" href="#">Contact</a>
+                <a class="nav-link mx-2" href="/">Work</a>
+                {% if current_user.is_authenticated and current_user.email == 'admin@test.gmail.com' %}
+                    <a class="nav-link mx-2 text-primary" href="/admin">Admin Panel</a>
+                    <a class="nav-link mx-2" href="/logout">Logout</a>
+                {% else %}
+                    <a class="nav-link mx-2" href="/login">Login</a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -172,55 +154,30 @@
 </div>
 
 <div class="container">
-    <div class="filter-nav">
-        <button class="filter-btn active">All</button>
-        <button class="filter-btn">Illustration</button>
-        <button class="filter-btn">Branding</button>
-        <button class="filter-btn">3D</button>
-    </div>
-
     <div class="row g-4">
+        {% for p in products %}
         <div class="col-12 col-md-6 col-lg-4">
             <div class="art-card">
-                <a href="#" class="text-decoration-none">
+                <a href="/project/{{ p.id }}" class="text-decoration-none">
                     <div class="img-container">
-                        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=800&q=80" alt="Artwork Name">
+                        <img src="{{ p.image }}" alt="{{ p.name }}">
                     </div>
                     <div class="art-info">
-                        <div class="art-category">Digital Illustration</div>
-                        <h3 class="art-title">Abstract Flow #01</h3>
+                        <div class="art-category">{{ p.category }}</div>
+                        <h3 class="art-title">{{ p.name }}</h3>
+                        <p class="small text-muted mt-2 text-truncate">{{ p.description }}</p>
                     </div>
                 </a>
             </div>
         </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="art-card">
-                <a href="#" class="text-decoration-none">
-                    <div class="img-container">
-                        <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=800&q=80" alt="Artwork Name">
-                    </div>
-                    <div class="art-info">
-                        <div class="art-category">Branding</div>
-                        <h3 class="art-title">Modern Identity</h3>
-                    </div>
-                </a>
-            </div>
+        {% endfor %}
+        
+        {% if not products %}
+        <div class="text-center py-5 opacity-50">
+            <i class="fa fa-images fa-3x mb-3"></i>
+            <p>Your portfolio gallery is empty. Log in to add projects.</p>
         </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="art-card">
-                <a href="#" class="text-decoration-none">
-                    <div class="img-container">
-                        <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=800&q=80" alt="Artwork Name">
-                    </div>
-                    <div class="art-info">
-                        <div class="art-category">Art Direction</div>
-                        <h3 class="art-title">Editorial Concept</h3>
-                    </div>
-                </a>
-            </div>
-        </div>
+        {% endif %}
     </div>
 </div>
 
