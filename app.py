@@ -14,7 +14,6 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'portfolio_secret_2026')
 database_url = os.environ.get("DATABASE_URL", "sqlite:///portfolio_v1.db")
 if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
-# This part fixes it if you only typed 'razi.db' in Render's settings
 elif not database_url.startswith("sqlite://") and not database_url.startswith("postgresql://"):
     database_url = f"sqlite:///{database_url}"
 
@@ -47,7 +46,6 @@ def load_user(user_id):
 # --- 3. DATABASE INIT & ADMIN RESET ---
 with app.app_context():
     db.create_all()
-    # This ensures your password 'razi123' always works after a fresh deploy
     admin_email = 'admin@test.gmail.com'
     admin_user = User.query.filter_by(email=admin_email).first()
     if admin_user:
@@ -77,7 +75,6 @@ def admin_panel():
     projects = Project.query.order_by(Project.date_added.desc()).all()
     return render_template('admin.html', products=projects)
 
-# Matches <form action="/admin/add-product">
 @app.route('/admin/add-product', methods=['POST'])
 @login_required
 def add_product():
@@ -94,7 +91,6 @@ def add_product():
     flash("Project Published!")
     return redirect(url_for('admin_panel'))
 
-# Matches <a href="/admin/delete-product/{{id}}">
 @app.route('/admin/delete-product/<int:id>')
 @login_required
 def delete_product(id):
@@ -117,12 +113,32 @@ def login():
         flash("Invalid Credentials")
     return render_template('login.html')
 
+# --- NEW SIGNUP ROUTE (Fixes "Not Found") ---
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        full_name = request.form.get('full_name')
+        password = request.form.get('password')
+        
+        if User.query.filter_by(email=email).first():
+            flash("Email already registered.")
+            return redirect(url_for('login'))
+            
+        hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
+        new_user = User(full_name=full_name, email=email, password=hashed_pw)
+        db.session.add(new_user)
+        db.session.commit()
+        
+        login_user(new_user)
+        return redirect(url_for('index'))
+    return render_template('signup.html')
+
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    # Fix for Render: must listen on 0.0.0.0 and the PORT env var
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
