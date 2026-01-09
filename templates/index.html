@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Your Name | Art & Design Portfolio</title>
+    <title>Studio | Portfolio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -11,188 +11,206 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
 
         :root {
-            --portfolio-accent: #000000; 
-            --portfolio-bg: #ffffff;
+            --bg: #ffffff;
+            --text-main: #000000;
             --text-muted: #666666;
+            /* Instagram Gradient */
+            --insta-gradient: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
         }
 
         body { 
-            background-color: var(--portfolio-bg); 
+            background-color: var(--bg); 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            color: #000;
+            color: var(--text-main);
             margin: 0;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Minimal Navigation */
+        /* --- STICKY INSTAGRAM SIDE BUTTON --- */
+        .sticky-instagram {
+            position: fixed;
+            right: 20px;
+            bottom: 30px;
+            width: 55px;
+            height: 55px;
+            background: var(--insta-gradient);
+            color: white !important;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            text-decoration: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .sticky-instagram:active {
+            transform: scale(0.9);
+        }
+
+        @media (hover: hover) {
+            .sticky-instagram:hover {
+                transform: translateY(-5px) scale(1.05);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            }
+        }
+
+        /* Responsive Navbar */
         .navbar { 
-            background: rgba(255, 255, 255, 0.95) !important; 
-            backdrop-filter: blur(10px);
-            padding: 20px 0; 
-            border-bottom: 1px solid #eee; 
+            background: rgba(255, 255, 255, 0.9) !important; 
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 15px 0; 
+            border-bottom: 1px solid rgba(0,0,0,0.05); 
         }
-        .navbar-brand { font-weight: 800; color: #000 !important; letter-spacing: 1px; font-size: 1.5rem; }
-        
-        .nav-link { 
-            font-size: 13px; 
-            font-weight: 600; 
-            color: #000 !important; 
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-        }
+        .navbar-brand { font-weight: 800; letter-spacing: 1px; }
 
-        /* Refined Hero Section */
+        /* Hero Section */
         .hero-section { 
-            padding: 100px 15px 60px 15px;
+            padding: 80px 20px 40px 20px;
             text-align: center; 
-            background: #fff;
         }
-
         .hero-section h1 { 
             font-weight: 800; 
-            font-size: 3rem; 
+            font-size: calc(1.8rem + 1.5vw); 
             letter-spacing: -1px; 
-            margin-bottom: 15px;
-        }
-
-        .hero-section p { 
-            font-size: 1.1rem; 
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
         }
 
         /* Portfolio Grid */
         .art-card { 
             border: none;
-            background: #fff; 
-            overflow: hidden; 
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            margin-bottom: 30px;
+            background: transparent; 
+            margin-bottom: 25px;
+            cursor: default;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
         
         .img-container { 
             aspect-ratio: 4 / 5; 
             overflow: hidden; 
-            background: #f8f8f8; 
-            position: relative;
+            border-radius: 4px;
+            background: #f0f0f0; 
         }
 
         .img-container img { 
             width: 100%; 
             height: 100%; 
             object-fit: cover; 
-            transition: transform 0.6s ease;
+            transition: transform 0.7s cubic-bezier(0.2, 0, 0.2, 1);
+            will-change: transform;
         }
 
-        .art-card:hover img {
-            transform: scale(1.05);
+        /* ZOOM ANIMATION (Non-clickable) */
+        @media (hover: hover) {
+            .art-card:hover img { transform: scale(1.1); }
+        }
+        
+        /* Mobile Touch Zoom */
+        .art-card:active img { 
+            transform: scale(1.06); 
+            transition: transform 0.3s ease;
         }
 
-        .art-info {
-            padding: 15px 5px;
-        }
-
+        .art-info { padding: 12px 2px; }
         .art-category { 
             font-size: 10px; 
             text-transform: uppercase; 
-            letter-spacing: 2px; 
+            letter-spacing: 1.5px; 
             color: var(--text-muted);
             font-weight: 700;
-            margin-bottom: 5px;
         }
+        .art-title { font-size: 17px; font-weight: 600; margin-top: 4px; }
 
-        .art-title { 
-            font-size: 18px; 
-            font-weight: 600; 
-            color: #000; 
-            margin-bottom: 0;
-        }
-
+        /* Footer Styles */
         footer {
-            background: #fcfcfc;
-            border-top: 1px solid #eee;
             padding: 60px 0;
-            margin-top: 80px;
+            border-top: 1px solid #eee;
+            background: #fafafa;
         }
+        .footer-insta {
+            font-size: 22px;
+            color: var(--text-main);
+            text-decoration: none;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .footer-insta:hover { opacity: 1; }
 
-        @media (max-width: 768px) {
-            .hero-section h1 { font-size: 2rem; }
-            .hero-section { padding: 60px 15px; }
+        /* Mobile Adjustments */
+        @media (max-width: 576px) {
+            .container { padding-left: 20px; padding-right: 20px; }
+            .sticky-instagram { width: 50px; height: 50px; right: 15px; bottom: 20px; font-size: 24px; }
         }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="/">STUDIO.NAME</a>
-        
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#portfolioNav">
-            <span class="fa fa-bars"></span>
-        </button>
+    <a href="https://www.instagram.com/artinc" target="_blank" class="sticky-instagram">
+        <i class="fab fa-instagram"></i>
+    </a>
 
-        <div class="collapse navbar-collapse" id="portfolioNav">
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link mx-2" href="/">Work</a>
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-dark" href="/">STUDIO</a>
+            
+            <div class="ms-auto">
                 {% if current_user.is_authenticated and current_user.email == 'admin@test.gmail.com' %}
-                    <a class="nav-link mx-2 text-primary" href="/admin">Admin Panel</a>
-                    <a class="nav-link mx-2" href="/logout">Logout</a>
+                    <a class="btn btn-sm btn-dark px-3 rounded-pill" href="/admin">Admin Panel</a>
                 {% else %}
-                    <a class="nav-link mx-2" href="/login">Login</a>
+                    <a class="text-dark text-decoration-none small fw-bold" href="/login">LOGIN</a>
                 {% endif %}
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<div class="hero-section">
-    <div class="container">
-        <h1>Digital Art & Brand Design</h1>
-        <p>Exploring the intersection of minimalism and digital surrealism through curated visual experiences.</p>
+    <div class="hero-section">
+        <div class="container">
+            <h1>Digital Art & Brand Design</h1>
+            <p class="text-muted">A curated collection of visual experiences.</p>
+        </div>
     </div>
-</div>
 
-<div class="container">
-    <div class="row g-4">
-        {% for p in products %}
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="art-card">
-                <a href="/project/{{ p.id }}" class="text-decoration-none">
+    <div class="container mb-5">
+        <div class="row">
+            {% for p in products %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="art-card">
                     <div class="img-container">
-                        <img src="{{ p.image }}" alt="{{ p.name }}">
+                        <img src="{{ p.image }}" alt="{{ p.name }}" loading="lazy">
                     </div>
                     <div class="art-info">
                         <div class="art-category">{{ p.category }}</div>
-                        <h3 class="art-title">{{ p.name }}</h3>
-                        <p class="small text-muted mt-2 text-truncate">{{ p.description }}</p>
+                        <div class="art-title">{{ p.name }}</div>
                     </div>
-                </a>
+                </div>
             </div>
+            {% endfor %}
+            
+            {% if not products %}
+            <div class="col-12 text-center py-5 opacity-50">
+                <i class="fa fa-images fa-3x mb-3"></i>
+                <p>Gallery is empty. Log in as admin to upload.</p>
+            </div>
+            {% endif %}
         </div>
-        {% endfor %}
-        
-        {% if not products %}
-        <div class="text-center py-5 opacity-50">
-            <i class="fa fa-images fa-3x mb-3"></i>
-            <p>Your portfolio gallery is empty. Log in to add projects.</p>
-        </div>
-        {% endif %}
     </div>
-</div>
 
-<footer>
-    <div class="container text-center">
-        <div class="mb-4">
-            <a href="#" class="mx-2 text-dark"><i class="fab fa-instagram fa-lg"></i></a>
-            <a href="#" class="mx-2 text-dark"><i class="fab fa-behance fa-lg"></i></a>
-            <a href="#" class="mx-2 text-dark"><i class="fab fa-dribbble fa-lg"></i></a>
+    <footer class="text-center">
+        <div class="container">
+            <a href="https://www.instagram.com/artinc" target="_blank" class="footer-insta">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <p class="small text-muted mb-0">© 2026 YOUR STUDIO NAME</p>
+            <p style="font-size: 10px; opacity: 0.4;" class="text-muted mt-1">Built with Passion</p>
         </div>
-        <p class="small text-muted mb-0">© 2026 YOUR NAME ART STUDIO </p>
-        <p class="small text-muted mb-0" style="font-size: 10px; opacity: 0.5;">built with passion</p>
-    </div>
-</footer>
+    </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
