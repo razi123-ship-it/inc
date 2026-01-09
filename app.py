@@ -30,7 +30,7 @@ class User(db.Model, UserMixin):
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    category = db.Column(db.String(50), default="Design") # Added for Portfolio
+    category = db.Column(db.String(50), default="Design") 
     image = db.Column(db.String(500))
     image_2 = db.Column(db.String(500)) 
     description = db.Column(db.Text)
@@ -40,14 +40,24 @@ class Project(db.Model):
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
-# --- DATABASE INITIALIZATION ---
+# --- DATABASE INITIALIZATION & ADMIN CREATION ---
 with app.app_context():
     db.create_all()
+    # Check if your specific admin account exists, if not, create it
+    admin_check = User.query.filter_by(email='admin@test.gmail.com').first()
+    if not admin_check:
+        hashed_pw = generate_password_hash('razi123', method='pbkdf2:sha256')
+        new_admin = User(
+            full_name="Admin", 
+            email='admin@test.gmail.com', 
+            password=hashed_pw
+        )
+        db.session.add(new_admin)
+        db.session.commit()
 
 # --- 3. MAIN PORTFOLIO ROUTES ---
 @app.route('/')
 def index():
-    # Only show projects, no cart or order logic needed
     projects = Project.query.order_by(Project.date_added.desc()).all()
     return render_template('index.html', products=projects)
 
@@ -59,11 +69,10 @@ def project_detail(id):
         return redirect(url_for('index'))
     return render_template('product_detail.html', product=project)
 
-# --- 4. ADMIN PANEL (MANAGE ARTWORK) ---
+# --- 4. ADMIN PANEL ---
 @app.route('/admin')
 @login_required
 def admin_panel():
-    # Set your specific email here for security
     if current_user.email != 'admin@test.gmail.com': 
         return "Access Denied", 403
     
@@ -130,7 +139,7 @@ def login():
         user = User.query.filter_by(email=request.form.get('email')).first()
         if user and check_password_hash(user.password, request.form.get('password')):
             login_user(user)
-            # If admin logs in, go straight to admin panel
+            # This is the fix: go to admin panel if the email matches yours
             if user.email == 'admin@test.gmail.com':
                 return redirect(url_for('admin_panel'))
             return redirect(url_for('index'))
