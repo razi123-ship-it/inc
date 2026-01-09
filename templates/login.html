@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login | EVIA Official</title>
+    <style>
+        :root {
+            --evia-black: #111111;
+            --evia-orange: #fb641b;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: #f8f9fa; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .login-card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            width: 100%;
+            max-width: 350px; 
+            margin: 20px;
+        }
+        h2 { text-align: center; color: var(--evia-black); margin-bottom: 5px; font-weight: 800; }
+        .subtitle { text-align: center; color: #666; font-size: 13px; margin-bottom: 25px; }
+        
+        .form-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 15px; 
+            border: 1px solid #eee; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            background: #fafafa;
+            font-size: 14px;
+        }
+        input:focus { outline: none; border-color: var(--evia-orange); background: #fff; }
+
+        .btn { 
+            width: 100%; 
+            padding: 14px; 
+            background: var(--evia-black); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            font-weight: 700; 
+            transition: transform 0.2s ease;
+        }
+        .btn:active { transform: scale(0.97); }
+
+        .footer-text { text-align: center; margin-top: 20px; font-size: 14px; color: #444; }
+        .footer-text a { color: var(--evia-orange); text-decoration: none; font-weight: 600; }
+        
+        .flash { 
+            background: #fff5f5;
+            color: #ff4444; 
+            text-align: center; 
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            border: 1px solid #ffebeb;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div style="text-align: center; margin-bottom: 15px;">
+            <a href="/" style="text-decoration: none; color: var(--evia-orange); font-weight: 900; font-size: 24px;">EVIA</a>
+        </div>
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Enter your credentials to access your account</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" placeholder="name@example.com" required>
+            
+            <label class="form-label">Password</label>
+            <input type="password" name="password" placeholder="••••••••" required>
+            
+            <button type="submit" class="btn">Login</button>
+        </form>
+
+        <div class="footer-text">
+            Don't have an account? <a href="/signup">Sign Up</a>
+        </div>
+    </div>
+</body>
+</html>
