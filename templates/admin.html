@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EVIA Admin | Logistics & Inventory</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+        :root { 
+            --bg: #050505; 
+            --surface-1: #0f0f12; 
+            --surface-2: #18181b;
+            --accent: #00ff88;
+            --border: rgba(255, 255, 255, 0.08);
+            --danger: #ff4444;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: #ffffff; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            height: 100vh; margin: 0; overflow: hidden;
+        }
+
+        .dashboard-container { display: flex; height: 100vh; flex-direction: row; }
+
+        /* Left Sidebar */
+        .nav-sidebar { 
+            width: 80px; background: var(--surface-1); border-right: 1px solid var(--border); 
+            display: flex; flex-direction: column; align-items: center; padding: 30px 0; z-index: 1000;
+        }
+        .nav-icon { 
+            width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; 
+            border-radius: 12px; margin-bottom: 25px; color: #666; transition: 0.3s; cursor: pointer; text-decoration: none; 
+        }
+        .nav-icon:hover, .nav-icon.active { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent); }
+
+        /* Panels */
+        .list-panel { 
+            width: 380px; background: var(--surface-1); border-right: 1px solid var(--border); 
+            overflow-y: auto; padding: 25px; transition: 0.3s;
+        }
+        .main-content { 
+            flex: 1; padding: 40px; overflow-y: auto; 
+            background: linear-gradient(135deg, #0a0a0a 0%, #050505 100%); transition: 0.3s;
+        }
+
+        /* Order Cards */
+        .order-card-sm { 
+            background: var(--surface-2); border: 1px solid var(--border); 
+            padding: 16px; border-radius: 16px; margin-bottom: 12px; cursor: pointer; transition: 0.2s;
+        }
+        .order-card-sm:hover { border-color: #444; }
+        .order-card-sm.active { border-color: var(--accent); background: #1d1d21; }
+
+        .stat-badge { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 5px; margin-top: 5px; display: inline-block; text-transform: uppercase; }
+        .status-placed { background: #333; color: white; }
+        .status-shipped { background: #3366ff; color: white; }
+        .status-out-for-delivery { background: #ffc107; color: black; }
+        .status-delivered { background: var(--accent); color: black; }
+        .status-cancelled { background: var(--danger); color: white; }
+
+        .glass-card { 
+            background: rgba(24, 24, 27, 0.6); backdrop-filter: blur(20px); 
+            border: 1px solid var(--border); border-radius: 25px; padding: 25px; 
+        }
+
+        .search-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: #fff; width: 100%; margin-bottom: 20px; }
+
+        /* Danger Zone Styling */
+        .danger-section {
+            background: rgba(255, 68, 68, 0.05); border: 1px dashed var(--danger);
+            border-radius: 15px; padding: 15px; margin-bottom: 25px;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .dashboard-container { flex-direction: column-reverse; }
+            .nav-sidebar { 
+                width: 100%; height: 70px; flex-direction: row; 
+                justify-content: space-around; padding: 0; border-right: none; border-top: 1px solid var(--border);
+            }
+            .nav-icon { margin-bottom: 0; }
+            .list-panel { width: 100%; height: calc(100vh - 70px); }
+            .main-content { 
+                position: fixed; top: 0; left: 0; width: 100%; height: calc(100vh - 70px); 
+                z-index: 1100; transform: translateX(100%); padding: 20px;
+            }
+            .main-content.active { transform: translateX(0); }
+        }
+
+        .modal-content { background: var(--surface-1); color: white; border: 1px solid var(--border); border-radius: 20px; }
+        .form-control { background: var(--surface-2); border: 1px solid var(--border); color: white; padding: 12px; }
+        .form-control:focus { background: var(--surface-2); color: white; border-color: var(--accent); box-shadow: none; }
+        .table { color: #fff; border-color: var(--border); }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <div class="nav-sidebar">
+        <a href="/" class="nav-icon"><i class="fa fa-shopping-bag"></i></a>
+        <div class="nav-icon active"><i class="fa fa-chart-line"></i></div>
+        <div class="nav-icon" data-bs-toggle="modal" data-bs-target="#productModal"><i class="fa fa-plus"></i></div>
+        <a href="/logout" class="nav-icon mt-md-auto text-danger"><i class="fa fa-power-off"></i></a>
+    </div>
+
+    <div class="list-panel" id="listPanel">
+        <h5 class="fw-800 mb-4">Logistics Feed <span class="text-muted small">({{ orders|length }})</span></h5>
+        
+        <input type="text" id="orderSearch" class="search-box" placeholder="Search customer name..." onkeyup="filterOrders()">
+
+        <div id="orderList">
+            {% for o in orders %}
+            <div class="order-card-sm" onclick="viewOrder('{{ o.id }}')" data-name="{{ o.customer.full_name|lower }}">
+                <div class="d-flex justify-content-between">
+                    <span class="fw-bold">{{ o.customer.full_name }}</span>
+                    <span class="small opacity-50">#{{ o.id }}</span>
+                </div>
+                <div class="stat-badge status-{{ o.status|lower|replace(' ', '-') }}">
+                    {{ o.status }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <hr class="my-4 opacity-10">
+        
+        <div class="danger-section">
+            <p class="small fw-bold text-danger mb-2">SYSTEM RESET</p>
+            <form action="{{ url_for('reset_system') }}" method="POST" onsubmit="return confirm('WARNING: This will delete ALL users and orders. Are you sure?');">
+                <button type="submit" class="btn btn-sm btn-outline-danger w-100 fw-bold">CLEAR TEST DATA</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <button class="btn btn-dark mb-3 d-md-none" onclick="closeDetails()"><i class="fa fa-arrow-left me-2"></i>Back to List</button>
+        
+        <div id="no-selection" class="text-center mt-5 opacity-25">
+            <i class="fa fa-terminal fa-4x mb-3"></i>
+            <h4>Management Console</h4>
+            <p class="small">Select an order from the feed to manage logistics</p>
+        </div>
+
+        {% for o in orders %}
+        <div id="detail-{{ o.id }}" class="detail-view d-none">
+            <div class="glass-card">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h2 class="fw-800 mb-0">{{ o.customer.full_name }}</h2>
+                        <a href="https://wa.me/{{ o.whatsapp }}" target="_blank" class="text-decoration-none small" style="color: var(--accent)">
+                           <i class="fab fa-whatsapp me-1"></i> Chat with Customer
+                        </a>
+                    </div>
+                    <h3 style="color: var(--accent)">₹{{ o.total_price }}</h3>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="opacity-50 small fw-bold mb-2">SHIPPING ADDRESS</label>
+                        <div class="p-3 rounded-3" style="background: var(--surface-1); border: 1px solid var(--border); font-size: 14px; min-height: 80px;">
+                            {{ o.address if o.address else 'No Address Provided' }}
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label class="opacity-50 small fw-bold mb-2">ORDERED ITEMS</label>
+                        <div class="p-3 rounded-3" style="background: var(--surface-1); border: 1px solid var(--border); font-weight: bold; min-height: 80px;">
+                            {{ o.product_details }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <label class="small fw-bold opacity-50 mb-1">LOGISTICS UPDATE</label>
+                    <div class="row g-2">
+                        <div class="col-6"><a href="/admin/update-status/{{ o.id }}/Shipped" class="btn btn-primary w-100 py-3 fw-bold small"><i class="fa fa-ship me-2"></i>SHIPPED</a></div>
+                        <div class="col-6"><a href="/admin/update-status/{{ o.id }}/Out%20for%20Delivery" class="btn btn-warning w-100 py-3 fw-bold small text-dark"><i class="fa fa-motorcycle me-2"></i>OFD</a></div>
+                        <div class="col-12"><a href="/admin/update-status/{{ o.id }}/Delivered" class="btn btn-success w-100 py-3 fw-bold"><i class="fa fa-check-double me-2"></i>MARK AS DELIVERED</a></div>
+                    </div>
+                    
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="/admin/update-status/{{ o.id }}/Cancelled" class="btn btn-dark flex-grow-1 fw-bold">CANCEL ORDER</a>
+                        <a href="/admin/delete-order/{{ o.id }}" class="btn btn-outline-danger" onclick="return confirm('Delete record permanently?')"><i class="fa fa-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="mt-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-800 mb-0"><i class="fa fa-boxes me-2"></i>Inventory Management</h4>
+                <button class="btn btn-accent btn-sm fw-bold" style="background:var(--accent); color:#000" data-bs-toggle="modal" data-bs-target="#productModal">+ Add New</button>
+            </div>
+            
+            <div class="glass-card p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">PRODUCT</th>
+                                <th>ASSETS</th>
+                                <th>PRICE</th>
+                                <th class="text-end pe-4">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in products %}
+                            <tr class="align-middle">
+                                <td class="ps-4">{{ p.name }}</td>
+                                <td>
+                                    <i class="fa fa-image me-1"></i>
+                                    {% if p.image_2 %}
+                                    <i class="fa fa-image text-info"></i>
+                                    {% endif %}
+                                </td>
+                                <td style="color: var(--accent);">₹{{ p.price }}</td>
+                                <td class="text-end pe-4">
+                                    <a href="/admin/delete-product/{{ p.id }}" class="btn btn-sm btn-outline-danger border-0">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="/admin/add-product" method="POST">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Upload New Item</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" name="name" class="form-control mb-3" placeholder="Product Name" required>
+                    <input type="number" name="price" class="form-control mb-3" placeholder="Price (₹)" required>
+                    
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="small opacity-50 mb-1">MAIN IMAGE URL</label>
+                            <input type="text" name="image" class="form-control" placeholder="URL" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="small opacity-50 mb-1">SECOND IMAGE</label>
+                            <input type="text" name="image_2" class="form-control" placeholder="Optional URL">
+                        </div>
+                    </div>
+                    
+                    <textarea name="description" class="form-control" rows="3" placeholder="Product details..."></textarea>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold">PUBLISH TO SHOP</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function viewOrder(id) {
+        document.getElementById('no-selection').classList.add('d-none');
+        document.querySelectorAll('.detail-view').forEach(el => el.classList.add('d-none'));
+        
+        const detailEl = document.getElementById('detail-' + id);
+        if(detailEl) detailEl.classList.remove('d-none');
+        
+        if(window.innerWidth < 768) {
+            document.getElementById('mainContent').classList.add('active');
+        }
+        
+        document.querySelectorAll('.order-card-sm').forEach(el => el.classList.remove('active'));
+        const activeCard = document.querySelector(`[onclick="viewOrder('${id}')"]`);
+        if(activeCard) activeCard.classList.add('active');
+    }
+
+    function closeDetails() { 
+        document.getElementById('mainContent').classList.remove('active'); 
+    }
+
+    function filterOrders() {
+        let input = document.getElementById('orderSearch').value.toLowerCase();
+        document.querySelectorAll('.order-card-sm').forEach(card => {
+            card.style.display = card.getAttribute('data-name').includes(input) ? "block" : "none";
+        });
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
