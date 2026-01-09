@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Join Us | EVIA Official</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-black: #111111;
+            --accent-orange: #fb641b;
+            --bg-gray: #f9f9fb;
+            --border-color: #e2e8f0;
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: var(--bg-gray); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card { 
+            background: white; 
+            padding: 32px 24px; 
+            border-radius: 20px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+            width: 100%;
+            max-width: 400px; 
+            box-sizing: border-box;
+        }
+
+        .logo-area { text-align: center; margin-bottom: 24px; }
+        .logo-area h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin: 0;
+            color: var(--primary-black);
+        }
+
+        h2 { 
+            text-align: left; 
+            color: #111; 
+            font-size: 18px; 
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .input-group { margin-bottom: 16px; }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            border: 1.5px solid var(--border-color); 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            transition: all 0.2s ease;
+            background: #fff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-black);
+        }
+
+        .btn { 
+            width: 100%; 
+            padding: 16px; 
+            background: var(--primary-black); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: 700; 
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .btn:active { transform: scale(0.98); opacity: 0.9; }
+
+        .footer-link {
+            text-align: center; 
+            margin-top: 24px; 
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .footer-link a {
+            color: var(--accent-orange);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .flash {
+            background: #fff5f5;
+            color: #e53e3e;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            border: 1px solid #feb2b2;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo-area">
+            <h1>EVIA</h1>
+        </div>
+        
+        <h2>Create your account</h2>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST">
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" name="full_name" placeholder="Razi" required>
+            </div>
+
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="name@gmail.com" required>
+            </div>
+
+            <div class="input-group">
+                <label>Craet Password</label>
+                <input type="password" name="password" placeholder="creat password" required>
+            </div>
+
+            <button type="submit" class="btn">Get Started</button>
+        </form>
+
+        <div class="footer-link">
+            Already a member? <a href="/login">Sign in</a>
+        </div>
+    </div>
+</body>
+</html>
